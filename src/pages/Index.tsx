@@ -2,6 +2,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Features } from "@/components/Features";
 import { TokenCreator } from "@/components/TokenCreator";
+import { CryptoChart } from "@/components/CryptoChart";
 import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
 
@@ -43,6 +44,14 @@ const Index = () => {
           <div className="mt-16 animate-float">
             <ArrowDown className="w-6 h-6 mx-auto text-primary" />
           </div>
+        </div>
+      </section>
+
+      {/* Market Overview Section */}
+      <section className="py-16 bg-accent/10">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-8">Market Overview</h2>
+          <CryptoChart />
         </div>
       </section>
 
