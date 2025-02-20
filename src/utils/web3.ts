@@ -3,7 +3,8 @@ import { ethers } from 'ethers';
 import TokenFactoryABI from '../contracts/abis/TokenFactory.json';
 import { toast } from '@/hooks/use-toast';
 
-const FACTORY_ADDRESS = '0x...'; // Will be set after deployment
+// This will be updated after deployment
+const FACTORY_ADDRESS = '0x4d44C861Df33bF2E1c93a43644aeD7A2F06A4139';
 
 export async function connectWallet(): Promise<string | null> {
   try {
