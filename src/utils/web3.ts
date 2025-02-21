@@ -9,9 +9,8 @@ const FACTORY_ADDRESS = '0x4d44C861Df33bF2E1c93a43644aeD7A2F06A4139';
 export async function connectWallet(): Promise<string | null> {
   try {
     if (!window.ethereum) {
-      toast({
-        title: "MetaMask Required",
-        description: "Please install MetaMask to use this feature",
+      toast.error("MetaMask Required", {
+        description: "Please install MetaMask to use this feature"
       });
       return null;
     }
@@ -32,9 +31,8 @@ export async function connectWallet(): Promise<string | null> {
     return accounts[0];
   } catch (error) {
     console.error('Error connecting wallet:', error);
-    toast({
-      title: "Connection Error",
-      description: "Failed to connect to wallet",
+    toast.error("Connection Error", {
+      description: "Failed to connect to wallet"
     });
     return null;
   }
@@ -47,9 +45,8 @@ export async function createToken(
 ): Promise<string | null> {
   try {
     if (!window.ethereum) {
-      toast({
-        title: "MetaMask Required",
-        description: "Please install MetaMask to create tokens",
+      toast.error("MetaMask Required", {
+        description: "Please install MetaMask to create tokens"
       });
       return null;
     }
@@ -63,27 +60,24 @@ export async function createToken(
       value: creationFee,
     });
     
-    toast({
-      title: "Transaction Sent",
-      description: "Please wait while your token is being created...",
+    toast.info("Transaction Sent", {
+      description: "Please wait while your token is being created..."
     });
 
     const receipt = await tx.wait();
     const event = receipt.events.find((e: any) => e.event === 'TokenCreated');
     
     if (event) {
-      toast({
-        title: "Success!",
-        description: "Token created successfully",
+      toast.success("Success!", {
+        description: "Token created successfully"
       });
       return event.args.tokenAddress;
     }
     return null;
   } catch (error: any) {
     console.error('Error creating token:', error);
-    toast({
-      title: "Creation Error",
-      description: error.message || "Failed to create token",
+    toast.error("Creation Error", {
+      description: error.message || "Failed to create token"
     });
     return null;
   }
