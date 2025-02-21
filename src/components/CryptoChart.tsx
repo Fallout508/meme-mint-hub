@@ -23,6 +23,9 @@ interface CoinData {
   symbol: string;
   current_price: number;
   price_change_percentage_24h: number;
+  sparkline_in_7d: {
+    price: number[];
+  };
 }
 
 export function CryptoChart() {
@@ -82,10 +85,10 @@ export function CryptoChart() {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={100}>
-              <LineChart data={coin.sparkline_in_7d?.price?.map((price: number, index: number) => ({
+              <LineChart data={coin.sparkline_in_7d.price.map((price: number, index: number) => ({
                 timestamp: index,
                 price: price,
-              })) || []}>
+              }))}>
                 <Line
                   type="monotone"
                   dataKey="price"
