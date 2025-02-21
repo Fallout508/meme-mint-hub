@@ -10,21 +10,24 @@ import { toast } from "sonner";
 
 const generateTokenImage = async (name: string, symbol: string) => {
   const apiKey = localStorage.getItem("runware_api_key");
-  if (!apiKey) {
-    const key = prompt("Please enter your Runware API key (get one at runware.ai):");
-    if (key) {
-      localStorage.setItem("runware_api_key", key);
+  let currentApiKey = apiKey;
+
+  if (!currentApiKey) {
+    const userInput = window.prompt("Please enter your Runware API key (get one at runware.ai):");
+    if (userInput) {
+      localStorage.setItem("runware_api_key", userInput);
+      currentApiKey = userInput;
     } else {
       return null;
     }
   }
 
-  const runware = new RunwareService(apiKey || "");
-  const prompt = `Create a fun and colorful meme coin logo for a cryptocurrency called ${name} (${symbol}). The image should be eye-catching and suitable for a crypto token, with elements that represent the token's name. Style: Modern, vibrant, professional crypto art`;
+  const runware = new RunwareService(currentApiKey);
+  const imagePrompt = `Create a fun and colorful meme coin logo for a cryptocurrency called ${name} (${symbol}). The image should be eye-catching and suitable for a crypto token, with elements that represent the token's name. Style: Modern, vibrant, professional crypto art`;
 
   try {
     const result = await runware.generateImage({
-      positivePrompt: prompt,
+      positivePrompt: imagePrompt,
     });
     return result.imageURL;
   } catch (error) {
