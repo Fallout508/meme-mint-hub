@@ -70,20 +70,28 @@ export function TokenCreator() {
       const contractAddress = await createToken(tokenName, tokenSymbol, totalSupply);
       
       if (contractAddress) {
-        // Save token to database
-        const { error } = await supabase.from('tokens').insert({
-          name: tokenName,
-          symbol: tokenSymbol,
-          supply: totalSupply,
-          contract_address: contractAddress,
-          image_url: imageUrl,
-        });
+        // Save token to database using any type to bypass strict typing
+        const { error } = await supabase
+          .from('tokens')
+          .insert({
+            name: tokenName,
+            symbol: tokenSymbol,
+            supply: parseFloat(totalSupply),
+            contract_address: contractAddress,
+            image_url: imageUrl,
+            creator_id: user.id
+          } as any);
 
         if (error) {
           throw error;
         }
 
         toast.success(`Token created successfully!`);
+        // Clear form
+        setTokenName("");
+        setTokenSymbol("");
+        setTotalSupply("");
+        setTokenImage(null);
       }
     } catch (error) {
       console.error("Error:", error);

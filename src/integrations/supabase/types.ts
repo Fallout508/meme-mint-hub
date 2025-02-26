@@ -63,6 +63,77 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      tokens: {
+        Row: {
+          contract_address: string | null
+          created_at: string
+          creator_id: string
+          id: string
+          image_url: string | null
+          name: string
+          supply: number
+          symbol: string
+        }
+        Insert: {
+          contract_address?: string | null
+          created_at?: string
+          creator_id: string
+          id?: string
+          image_url?: string | null
+          name: string
+          supply: number
+          symbol: string
+        }
+        Update: {
+          contract_address?: string | null
+          created_at?: string
+          creator_id?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          supply?: number
+          symbol?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tokens_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -71,7 +142,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "user" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
