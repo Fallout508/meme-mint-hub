@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { createToken } from "@/utils/web3";
 import { RunwareService } from "@/services/imageService";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const generateTokenImage = async (name: string, symbol: string) => {
   const apiKey = localStorage.getItem("runware_api_key");
@@ -43,10 +45,19 @@ export function TokenCreator() {
   const [totalSupply, setTotalSupply] = useState("");
   const [loading, setLoading] = useState(false);
   const [tokenImage, setTokenImage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      toast.error("Please login to create a token");
+      navigate("/auth");
+      return;
+    }
 
     try {
       // Generate token image first
@@ -55,9 +66,23 @@ export function TokenCreator() {
         setTokenImage(imageUrl);
       }
 
-      // Create the token
-      const tokenAddress = await createToken(tokenName, tokenSymbol, totalSupply);
-      if (tokenAddress) {
+      // Create the token on the blockchain
+      const contractAddress = await createToken(tokenName, tokenSymbol, totalSupply);
+      
+      if (contractAddress) {
+        // Save token to database
+        const { error } = await supabase.from('tokens').insert({
+          name: tokenName,
+          symbol: tokenSymbol,
+          supply: totalSupply,
+          contract_address: contractAddress,
+          image_url: imageUrl,
+        });
+
+        if (error) {
+          throw error;
+        }
+
         toast.success(`Token created successfully!`);
       }
     } catch (error) {

@@ -1,21 +1,39 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Coins, Wallet } from "lucide-react";
+import { Coins, Wallet, User } from "lucide-react";
 import { connectWallet } from "@/utils/web3";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    // Check for user session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleConnectWallet = async () => {
@@ -31,6 +49,15 @@ export function Navbar() {
       toast.error("Failed to connect wallet");
     } finally {
       setIsConnecting(false);
+    }
+  };
+
+  const handleAuth = () => {
+    if (user) {
+      supabase.auth.signOut();
+      toast.success("Logged out successfully");
+    } else {
+      navigate("/auth");
     }
   };
 
@@ -54,16 +81,26 @@ export function Navbar() {
               Create Token
             </a>
           </div>
-          <Button
-            onClick={handleConnectWallet}
-            disabled={isConnecting}
-            className="bg-primary hover:bg-primary/90 transition-all duration-200"
-          >
-            <Wallet className="w-4 h-4 mr-2" />
-            {walletAddress
-              ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-              : "Connect Wallet"}
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={handleConnectWallet}
+              disabled={isConnecting}
+              className="bg-primary hover:bg-primary/90 transition-all duration-200"
+            >
+              <Wallet className="w-4 h-4 mr-2" />
+              {walletAddress
+                ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+                : "Connect Wallet"}
+            </Button>
+            <Button
+              onClick={handleAuth}
+              variant="ghost"
+              className="border border-primary/20 hover:bg-accent/50"
+            >
+              <User className="w-4 h-4 mr-2" />
+              {user ? "Logout" : "Login"}
+            </Button>
+          </div>
         </div>
       </div>
     </nav>
